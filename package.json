@@ -1,0 +1,52 @@
+{
+  "name": "server-side-gating",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.24.0",
+  "scripts": {
+    "dev": "concurrently -k \"tsx server.ts\" \"vite --host 127.0.0.1 --port 5198 --strictPort\"",
+    "typecheck": "tsc --noEmit",
+    "build": "pnpm build:validator && vite build",
+    "test": "tsx --test tests/*.test.ts",
+    "test:server": "tsx --test tests/server.test.ts",
+    "browsers": "playwright install chromium",
+    "preview": "vite preview",
+    "test:validator": "tsx --test tests/validator.test.ts",
+    "build:validator": "tsc -p validator/tsconfig.json",
+    "test:browser": "node tests/browser.mjs"
+  },
+  "dependencies": {
+    "@hocuspocus/provider": "2.15.3",
+    "@hocuspocus/server": "2.15.3",
+    "@superdoc/react": "2.20.0",
+    "lib0": "^0.2.114",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "y-protocols": "^1.0.6",
+    "yjs": "13.6.31",
+    "superdoc": "2.25.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.2.6",
+    "@types/react-dom": "^19.2.3",
+    "@types/ws": "^8.18.1",
+    "@vitejs/plugin-react": "^5.1.1",
+    "concurrently": "^9.1.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.2",
+    "vite": "^7.2.7",
+    "ws": "^8.18.0"
+  },
+  "exports": {
+    "./validator": {
+      "types": "./validator-dist/index.d.ts",
+      "import": "./validator-dist/index.js"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/mattConnHarbour/server-side-gating.git"
+  }
+}

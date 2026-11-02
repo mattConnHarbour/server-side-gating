@@ -1,0 +1,11 @@
+node_modules/
+dist/
+evidence/
+validator-dist/
+test-results/
+playwright-report/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
