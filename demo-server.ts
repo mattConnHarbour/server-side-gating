@@ -8,7 +8,7 @@ type Room = { opened: boolean; creator?: { clientId: string; expiresAt: number }
 const prefix = 'sd2/v2.1/';
 const defaults = (): Permissions => ({ comment: true, suggestion: true, edit: true });
 
-export function createDemoServer(port = 1238, { creationLeaseMs = 15_000 } = {}) {
+export function createDemoServer(port = 1238, { creationLeaseMs = 15_000, address = '127.0.0.1' } = {}) {
   const rooms = new Map<string, Room>();
   const accepted = new Map<string, Uint8Array>();
   const admission = new Map<string, Promise<void>>();
@@ -28,7 +28,7 @@ export function createDemoServer(port = 1238, { creationLeaseMs = 15_000 } = {})
     }
   };
   const server = Server.configure({
-    port, address: '127.0.0.1', quiet: true, stopOnSignals: false, debounce: 0, maxDebounce: 0,
+    port, address, quiet: true, stopOnSignals: false, debounce: 0, maxDebounce: 0,
     async onAuthenticate({ token, documentName, requestParameters, socketId }) {
       if (!/^(writer|observer)$/.test(token)) throw new Error('Use a demo identity');
       const clientId = requestParameters.get('clientId') ?? '';
@@ -45,6 +45,10 @@ export function createDemoServer(port = 1238, { creationLeaseMs = 15_000 } = {})
       const match = /^\/api\/rooms\/([\w-]{1,80})(?:\/(open|permissions|state))?$/.exec(url.pathname);
       response.setHeader('Content-Type', 'application/json');
       response.setHeader('Cache-Control', 'no-store');
+      if (url.pathname === '/healthz' && request.method === 'GET') {
+        response.end(JSON.stringify({ status: 'ok' }));
+        throw null;
+      }
       if (!match) { response.writeHead(404).end('{}'); throw null; }
       const room = roomFor(match[1]);
       try {

@@ -4,7 +4,7 @@ A standalone React and Hocuspocus demo with an importable Node validator and per
 
 ## Run
 
-Requires Node.js 22.12+ and pnpm 11.24.0.
+Requires Node.js 22.13+ and pnpm 11.24.0.
 
 ```sh
 git clone git@github.com:mattConnHarbour/server-side-gating.git
@@ -13,7 +13,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open **http://127.0.0.1:5198**. The backend binds loopback port **1238**. Use `COLLABORATION_PORT` to override the backend port. Open the second-client link after the first client finishes creating the room. Room state and permissions are in memory and reset when the backend stops; use `?room=another-room` for a fresh document.
+Open **http://127.0.0.1:5198**. The backend listens on port **1238**, with `HOST` available to override the default `0.0.0.0` address. Use `COLLABORATION_PORT` to override the backend port; `PORT` takes precedence when provided by a hosting platform. Open the second-client link after the first client finishes creating the room. Room state and permissions are in memory and reset when the backend stops; use `?room=another-room` for a fresh document.
 
 The backend reserves a single initializer and marks a room open only after the Yjs bootstrap state is `committed`. Other clients wait during initialization, then join. An abandoned reservation for an empty room expires; a partial initialization is preserved and offers a link to a fresh room instead of resetting it. Browser reloads join committed rooms. Keep initial `edit` permission enabled until creation finishes. Both clients keep the editor role. Client policy toggles do not suppress editor commands: the server evaluates them independently.
 
@@ -68,7 +68,22 @@ The prototype creates an isolated full-state copy and compares modeled snapshots
 
 Production qualification would additionally require independent validation of journal/evidence payloads and repair/replay effects, schema/version compatibility, derived source metadata, complete revision semantics, authorship/ownership, malicious hidden/pending structures, resource bounds and adversarial concurrency. This prototype does not certify those properties. It rejects updates with unresolved dependencies rather than retaining them for later application. It has a 2 MiB update limit and does not persist rejected bytes.
 
-**Local identity/admin simulation:** the two literal demo identities (`writer`, `observer`) are not real credentials. The loopback API intentionally lets the user change their own flags. A real deployment must authenticate connections, authorize the policy-setting API, and supply real authorization independently of client identity/author fields. This app is not configured for deployment.
+**Demo identity/admin simulation:** the two literal demo identities (`writer`, `observer`) are not real credentials. The demo API intentionally lets visitors change their own flags. A production application must authenticate connections, authorize the policy-setting API, and supply real authorization independently of client identity/author fields. Use synthetic content only in the hosted demo.
+
+## Deploy
+
+The frontend runs at https://server-side-gating.pages.dev on Cloudflare Pages. Its Pages Function forwards `/api/*`, `/collaboration` (including WebSocket upgrades), and `/healthz` to the Railway backend configured as `BACKEND_ORIGIN` in `wrangler.toml`. Other requests serve static assets directly.
+
+The backend runs at https://backend-production-0f98.up.railway.app using the root `Dockerfile` and `railway.json`. Run one backend replica because rooms, permissions, and accepted document state live in memory and reset on restart or redeployment. `GET /healthz` is the deployment health check.
+
+```sh
+# From a directory linked to the server-side-gating Railway project:
+railway up --service backend --environment production --detach -m "Deploy operation gate"
+
+# Build and deploy the frontend plus its proxy function:
+pnpm build
+wrangler pages deploy dist --project-name server-side-gating --branch main
+```
 
 ## Verification
 

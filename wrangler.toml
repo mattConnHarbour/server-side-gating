@@ -1,0 +1,6 @@
+name = "server-side-gating"
+pages_build_output_dir = "./dist"
+compatibility_date = "2025-04-01"
+
+[vars]
+BACKEND_ORIGIN = "https://backend-production-0f98.up.railway.app"

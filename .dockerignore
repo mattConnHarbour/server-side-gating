@@ -1,0 +1,10 @@
+node_modules
+dist
+validator-dist
+evidence
+test-results
+playwright-report
+.git
+.wrangler
+.env
+.env.*

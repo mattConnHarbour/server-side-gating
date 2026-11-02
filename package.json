@@ -4,6 +4,7 @@
   "type": "module",
   "packageManager": "pnpm@11.24.0",
   "scripts": {
+    "start": "tsx server.ts",
     "dev": "concurrently -k \"tsx server.ts\" \"vite --host 127.0.0.1 --port 5198 --strictPort\"",
     "typecheck": "tsc --noEmit",
     "build": "pnpm build:validator && vite build",
